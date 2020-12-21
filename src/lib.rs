@@ -62,9 +62,8 @@
 
 #![deny(missing_docs)]
 // avoid warnings about RDMAmojo, iWARP, InfiniBand, etc. not being in backticks
-#![cfg_attr(feature = "cargo-clippy", allow(doc_markdown))]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::doc_markdown))]
 
-use std::error::Error;
 use std::ffi::CStr;
 use std::io;
 use std::marker::PhantomData;
@@ -357,7 +356,7 @@ impl Context {
         } else {
             Ok(CompletionQueue {
                 _phantom: PhantomData,
-                cq: cq,
+                cq,
             })
         }
     }
@@ -369,6 +368,7 @@ impl Context {
     /// A protection domain is a means of protection, and helps you create a group of object that
     /// can work together. If several objects were created using PD1, and others were created using
     /// PD2, working with objects from group1 together with objects from group2 will not work.
+    #[allow(clippy::result_unit_err)]
     pub fn alloc_pd(&self) -> Result<ProtectionDomain, ()> {
         let pd = unsafe { ffi::ibv_alloc_pd(self.ctx) };
         if pd.is_null() {
@@ -417,6 +417,7 @@ impl<'ctx> CompletionQueue<'ctx> {
     /// Note that `poll` does not block or cause a context switch. This is why RDMA technologies
     /// can achieve very low latency (below 1 µs).
     #[inline]
+    #[allow(clippy::result_unit_err)]
     pub fn poll<'c>(
         &self,
         completions: &'c mut [ffi::ibv_wc],
@@ -450,7 +451,7 @@ impl<'a> Drop for CompletionQueue<'a> {
         let errno = unsafe { ffi::ibv_destroy_cq(self.cq) };
         if errno != 0 {
             let e = io::Error::from_raw_os_error(errno);
-            panic!("{}", e.description());
+            panic!("{}", e.to_string());
         }
     }
 }
@@ -512,7 +513,7 @@ impl<'res> QueuePairBuilder<'res> {
     {
         QueuePairBuilder {
             ctx: 0,
-            pd: pd,
+            pd,
 
             send,
             max_send_wr,
@@ -718,7 +719,7 @@ impl<'res> QueuePairBuilder<'res> {
         } else {
             Ok(PreparedQueuePair {
                 ctx: self.pd.ctx,
-                qp: qp,
+                qp,
 
                 access: self.access,
                 timeout: self.timeout,
@@ -821,6 +822,7 @@ impl<'res> PreparedQueuePair<'res> {
     ///  - `ENOMEM`: Not enough resources to complete this operation.
     ///
     /// [RDMAmojo]: http://www.rdmamojo.com/2014/01/18/connecting-queue-pairs/
+    #[allow(clippy::field_reassign_with_default)]
     pub fn handshake(self, remote: QueuePairEndpoint) -> io::Result<QueuePair<'res>> {
         // init and associate with port
         let mut attr = ffi::ibv_qp_attr::default();
@@ -925,7 +927,7 @@ impl<T> Drop for MemoryRegion<T> {
         let errno = unsafe { ffi::ibv_dereg_mr(self.mr) };
         if errno != 0 {
             let e = io::Error::from_raw_os_error(errno);
-            panic!("{}", e.description());
+            panic!("{}", e.to_string());
         }
     }
 }
@@ -1042,7 +1044,7 @@ impl<'a> Drop for ProtectionDomain<'a> {
         let errno = unsafe { ffi::ibv_dealloc_pd(self.pd) };
         if errno != 0 {
             let e = io::Error::from_raw_os_error(errno);
-            panic!("{}", e.description());
+            panic!("{}", e.to_string());
         }
     }
 }
@@ -1107,10 +1109,10 @@ impl<'res> QueuePair<'res> {
         let mut sge = ffi::ibv_sge {
             addr: range.as_ptr() as u64,
             length: (mem::size_of::<T>() * range.len()) as u32,
-            lkey: (&*mr.mr).lkey,
+            lkey: (*mr.mr).lkey,
         };
         let mut wr = ffi::ibv_send_wr {
-            wr_id: wr_id,
+            wr_id,
             next: ptr::null::<ffi::ibv_send_wr>() as *mut _,
             sg_list: &mut sge as *mut _,
             num_sge: 1,
@@ -1137,8 +1139,8 @@ impl<'res> QueuePair<'res> {
         // ... However, if the IBV_SEND_INLINE flag was set, the  buffer  can  be reused
         // immediately after the call returns.
 
-        let ctx = (&*self.qp).context;
-        let ops = &mut (&mut *ctx).ops;
+        let ctx = (*self.qp).context;
+        let ops = &mut (*ctx).ops;
         let errno =
             ops.post_send.as_mut().unwrap()(self.qp, &mut wr as *mut _, &mut bad_wr as *mut _);
         if errno != 0 {
@@ -1191,10 +1193,10 @@ impl<'res> QueuePair<'res> {
         let mut sge = ffi::ibv_sge {
             addr: range.as_ptr() as u64,
             length: (mem::size_of::<T>() * range.len()) as u32,
-            lkey: (&*mr.mr).lkey,
+            lkey: (*mr.mr).lkey,
         };
         let mut wr = ffi::ibv_recv_wr {
-            wr_id: wr_id,
+            wr_id,
             next: ptr::null::<ffi::ibv_send_wr>() as *mut _,
             sg_list: &mut sge as *mut _,
             num_sge: 1,
@@ -1213,8 +1215,8 @@ impl<'res> QueuePair<'res> {
         // means that in all cases, the actual data of the incoming message will start at an offset
         // of 40 bytes into the buffer(s) in the scatter list.
 
-        let ctx = (&*self.qp).context;
-        let ops = &mut (&mut *ctx).ops;
+        let ctx = (*self.qp).context;
+        let ops = &mut (*ctx).ops;
         let errno =
             ops.post_recv.as_mut().unwrap()(self.qp, &mut wr as *mut _, &mut bad_wr as *mut _);
         if errno != 0 {
@@ -1231,7 +1233,7 @@ impl<'a> Drop for QueuePair<'a> {
         let errno = unsafe { ffi::ibv_destroy_qp(self.qp) };
         if errno != 0 {
             let e = io::Error::from_raw_os_error(errno);
-            panic!("{}", e.description());
+            panic!("{}", e.to_string());
         }
     }
 }

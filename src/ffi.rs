@@ -1,4 +1,4 @@
-#![cfg_attr(feature = "cargo-clippy", allow(expl_impl_clone_on_copy))]
+#![cfg_attr(feature = "cargo-clippy", allow(clippy::expl_impl_clone_on_copy))]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 /// An ibverb work completion.
@@ -48,7 +48,7 @@ pub struct ibv_wc {
     pub dlid_path_bits: u8,
 }
 
-#[cfg_attr(feature = "cargo-clippy", allow(len_without_is_empty))]
+#[cfg_attr(feature = "cargo-clippy", allow(clippy::len_without_is_empty))]
 impl ibv_wc {
     /// Returns the 64 bit value that was associated with the corresponding Work Request.
     pub fn wr_id(&self) -> u64 {
@@ -196,7 +196,7 @@ fn bindgen_test_layout_ibv_wc() {
         concat!("Alignment of ", stringify!(ibv_wc))
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).wr_id as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).wr_id as *const _ as usize },
         0usize,
         concat!(
             "Alignment of field: ",
@@ -206,7 +206,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).status as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).status as *const _ as usize },
         8usize,
         concat!(
             "Alignment of field: ",
@@ -216,7 +216,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).opcode as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).opcode as *const _ as usize },
         12usize,
         concat!(
             "Alignment of field: ",
@@ -226,7 +226,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).vendor_err as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).vendor_err as *const _ as usize },
         16usize,
         concat!(
             "Alignment of field: ",
@@ -236,7 +236,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).byte_len as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).byte_len as *const _ as usize },
         20usize,
         concat!(
             "Alignment of field: ",
@@ -246,7 +246,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).qp_num as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).qp_num as *const _ as usize },
         28usize,
         concat!(
             "Alignment of field: ",
@@ -256,7 +256,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).src_qp as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).src_qp as *const _ as usize },
         32usize,
         concat!(
             "Alignment of field: ",
@@ -266,7 +266,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).wc_flags as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).wc_flags as *const _ as usize },
         36usize,
         concat!(
             "Alignment of field: ",
@@ -276,7 +276,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).pkey_index as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).pkey_index as *const _ as usize },
         40usize,
         concat!(
             "Alignment of field: ",
@@ -286,7 +286,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).slid as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).slid as *const _ as usize },
         42usize,
         concat!(
             "Alignment of field: ",
@@ -296,7 +296,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).sl as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).sl as *const _ as usize },
         44usize,
         concat!(
             "Alignment of field: ",
@@ -306,7 +306,7 @@ fn bindgen_test_layout_ibv_wc() {
         )
     );
     assert_eq!(
-        unsafe { &(*(0 as *const ibv_wc)).dlid_path_bits as *const _ as usize },
+        unsafe { &(*std::ptr::null::<ibv_wc>()).dlid_path_bits as *const _ as usize },
         45usize,
         concat!(
             "Alignment of field: ",
