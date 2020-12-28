@@ -1,5 +1,4 @@
-#![cfg_attr(feature = "cargo-clippy", allow(clippy::expl_impl_clone_on_copy))]
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+use crate::raw::{ibv_wc_flags, ibv_wc_opcode, ibv_wc_status};
 
 /// An ibverb work completion.
 #[repr(C)]

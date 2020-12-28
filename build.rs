@@ -1,7 +1,5 @@
 extern crate bindgen;
 
-use std::env;
-use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
@@ -25,11 +23,14 @@ fn main() {
     // generate the bindings
     let bindings = bindgen::Builder::default()
         .header("vendor/rdma-core/libibverbs/verbs.h")
+        .header("vendor/rdma-core/librdmacm/rdma_cma.h")
         .clang_arg("-Ivendor/rdma-core/build/include/")
         // https://github.com/servo/rust-bindgen/issues/550
         .blacklist_type("max_align_t")
         .whitelist_function("ibv_.*")
         .whitelist_type("ibv_.*")
+        .whitelist_function("rdma_.*")
+        .whitelist_type("rdma_.*")
         .bitfield_enum("ibv_access_flags")
         .bitfield_enum("ibv_qp_attr_mask")
         .bitfield_enum("ibv_wc_flags")
@@ -48,13 +49,12 @@ fn main() {
         .derive_default(true)
         .derive_debug(true)
         .prepend_enum_name(false)
-        .blacklist_type("ibv_wc")
         .generate()
         .expect("Unable to generate bindings");
 
     // write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
-        .write_to_file(out_path.join("bindings.rs"))
+        .write_to_file("target/bindings.rs")
         .expect("Could not write bindings");
 }
