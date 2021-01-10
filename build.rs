@@ -6,6 +6,7 @@ fn main() {
     println!("cargo:include=vendor/rdma-core/build/include");
     println!("cargo:rustc-link-search=native=vendor/rdma-core/build/lib");
     println!("cargo:rustc-link-lib=ibverbs");
+    println!("cargo:rustc-link-lib=rdmacm");
 
     // initialize and update submodules
     Command::new("git")
@@ -55,6 +56,6 @@ fn main() {
     // write the bindings to the $OUT_DIR/bindings.rs file.
     // let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
-        .write_to_file("target/bindings.rs")
+        .write_to_file("src/bindings.rs")
         .expect("Could not write bindings");
 }
